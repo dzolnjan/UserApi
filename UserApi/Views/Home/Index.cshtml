@@ -1,0 +1,89 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+<div class="well">Signup form test</div>
+<form class="form-horizontal" id="simpleform">
+    <div class="control-group">
+        <label class="control-label" for="Email">Email</label>
+        <div class="controls">
+            <input type="text" id="Email" placeholder="enter your Email here" name="Email">
+        </div>
+    </div>
+    <div class="control-group">
+        <label class="control-label" for="Password">Password</label>
+        <div class="controls">
+            <input type="text" id="Password" placeholder="enter your Password here" name="Password" >
+        </div>
+    </div>
+       <div class="control-group">
+        <div class="controls">
+            <button type="submit" class="btn" id="btn">Submit</button>
+        </div>
+    </div>
+</form>
+<br/>
+
+<h4>Request</h4>
+<pre id="request">
+</pre>
+<h4>Results</h4>
+<pre id="results">
+</pre>
+
+@section scripts {
+    <script>
+        $(function () {
+            var $ul = $('#results');
+            var $request = $('#request');
+
+            $('#btn').click(function (e) {
+
+                e.preventDefault();
+
+                var reqDummy = {};
+                reqDummy.Email = $('#Email').val();
+                reqDummy.Password = $('#Password').val();
+
+                $request.html(syntaxHighlight(JSON.stringify(reqDummy, null, 4)));
+                $ul.text('processing request...');
+
+                var request = $.ajax({
+                    url: "/api/v5/user/signup",
+                    type: "POST",
+                    data: $('#simpleform').serialize(),
+                    dataType: "json"
+                });
+
+                request.done(function (results) {
+                    $ul.html(syntaxHighlight(JSON.stringify(results, null, 4)));
+                });
+
+                request.fail(function (jqXHR, textStatus) {
+                    alert("Request failed: " + textStatus);
+                });
+            });
+        });
+
+        function syntaxHighlight(json) {
+            if (typeof json != 'string') {
+                json = JSON.stringify(json, undefined, 2);
+            }
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                var cls = 'number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'key';
+                    } else {
+                        cls = 'string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+    </script>
+}
