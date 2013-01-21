@@ -56,7 +56,7 @@ namespace UserApi.Models
         public string ConfirmPassword { get; set; }
     }
 
-    public class LoginModel
+    public class LoginModelOrg
     {
         [Required]
         [Display(Name = "User name")]

@@ -9,14 +9,15 @@ namespace UserApi
 {
     public class RouteConfig
     {
+        const string API_BASE_PATH = "api/v5/";
+
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute(
-                name: "Signup",
-                url: "api/v5/user/signup",
-                defaults: new { controller = "User", action = "Signup" }
+                name: "Api",
+                url: API_BASE_PATH + "{controller}/{action}"
             );
 
             routes.MapRoute(
@@ -24,8 +25,6 @@ namespace UserApi
                 url: "{controller}/{action}/{id}",
                 defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }
             );
-
-
         }
     }
 }

@@ -1,26 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Net;
+using System.Net.Http;
+using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Security;
 using UserApi.Code;
 using UserApi.Models;
-using WebMatrix.WebData;
 
-namespace UserApi.Controllers
+namespace MvcApplication3.Controllers
 {
-    public class UserController : Controller
+    public class User1Controller : ApiController
     {
-        [HttpPost]
-        public ActionResult Signup(SignupModel model)
+        public object Signup([FromBody]SignupModel model)
         {
             if (ModelState.IsValid)
             {
                 var user = SimpleInMemoryRepo.Users.SingleOrDefault(x => x.Username == model.Email);
                 if (user != null)
                 {
-                    return Json(new { TokenId = "Email address already registered." });
+                    return new { TokenId = "Email address already registered." };
                 }
 
                 var token = Guid.NewGuid().ToString();
@@ -28,19 +28,18 @@ namespace UserApi.Controllers
                 user = new User() { Username = model.Email, Password = model.Password, Token = token };
                 SimpleInMemoryRepo.Users.Add(user);
 
-                return Json(new { TokenId = token });
+                return new { TokenId = token };
             }
 
             if (ModelState.Keys.Any(key => key.Contains("Email")))
             {
-                return Json(new { TokenId = "Email address empty or invalid." });
+                return new { TokenId = "Email address empty or invalid." };
             }
 
-            return Json(new { TokenId = "Password is empty." });
+            return new { TokenId = "Password is empty." };
         }
 
-        [HttpPost]
-        public ActionResult Login(LoginModel model)
+        public object Login([FromBody]LoginModel model)
         {
             if (ModelState.IsValid)
             {
@@ -49,17 +48,16 @@ namespace UserApi.Controllers
                 {
                     var token = Guid.NewGuid();
                     user.Token = token.ToString();
-                    return Json(new { TokenId = token.ToString() });
+                    return new { TokenId = token.ToString() };
                 }
 
-                return Json(new { TokenId = "Email address and password combination not found." });
+                return new { TokenId = "Email address and password combination not found." };
             }
 
-            return Json(new { TokenId = "Username address or password is empty." });
+            return new { TokenId = "Username address or password is empty." };
         }
 
-        [HttpPost]
-        public ActionResult Logout(string token)
+        public object Logout([FromBody]string token)
         {
             var user = SimpleInMemoryRepo.Users.SingleOrDefault(x => x.Token == token);
             if (user != null)
@@ -67,8 +65,7 @@ namespace UserApi.Controllers
                 user.Token = null;
             }
 
-            return Json(new LogoutResponseModel { Code = "200", Detail = "Success", Message = "Token expired" });
+            return new LogoutResponseModel { Code = "200", Detail = "Success", Message = "Token expired" };
         }
-
     }
 }

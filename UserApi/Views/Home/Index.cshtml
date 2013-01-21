@@ -1,26 +1,64 @@
-﻿@{
-    ViewBag.Title = "Home Page";
-}
-<div class="well">Signup form test</div>
-<form class="form-horizontal" id="simpleform">
-    <div class="control-group">
-        <label class="control-label" for="Email">Email</label>
-        <div class="controls">
-            <input type="text" id="Email" placeholder="enter your Email here" name="Email">
+﻿<div style="float: left">
+    <div class="well">Signup test</div>
+    <form class="form-horizontal" data-action="signup">
+        <div class="control-group">
+            <label class="control-label" for="Email">Email</label>
+            <div class="controls">
+                <input type="text" id="Email" placeholder="enter your Email here" name="Email">
+            </div>
         </div>
-    </div>
-    <div class="control-group">
-        <label class="control-label" for="Password">Password</label>
-        <div class="controls">
-            <input type="text" id="Password" placeholder="enter your Password here" name="Password" >
+        <div class="control-group">
+            <label class="control-label" for="Password">Password</label>
+            <div class="controls">
+                <input type="text" id="Password" placeholder="enter your Password here" name="Password">
+            </div>
         </div>
-    </div>
-       <div class="control-group">
-        <div class="controls">
-            <button type="submit" class="btn" id="btn">Submit</button>
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" class="btn">Submit</button>
+            </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
+<div style="float: left">
+    <div class="well">Login test</div>
+    <form class="form-horizontal" data-action="login">
+        <div class="control-group">
+            <label class="control-label" for="Username">Username</label>
+            <div class="controls">
+                <input type="text" id="Username" placeholder="enter your Email here" name="Username">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="Password1">Password</label>
+            <div class="controls">
+                <input type="text" id="Password1" placeholder="enter your Password here" name="Password">
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" class="btn">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div style="float: left">
+    <div class="well">Logout test</div>
+    <form class="form-horizontal" data-action="logout">
+        <div class="control-group">
+            <label class="control-label" for="Token">Token</label>
+            <div class="controls">
+                <input type="text" id="Token" placeholder="User token to logout" name="Token">
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" class="btn">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="clearfix"></div>
 <br/>
 
 <h4>Request</h4>
@@ -36,21 +74,21 @@
             var $ul = $('#results');
             var $request = $('#request');
 
-            $('#btn').click(function (e) {
-
+            $('.btn').click(function (e) {
                 e.preventDefault();
 
-                var reqDummy = {};
-                reqDummy.Email = $('#Email').val();
-                reqDummy.Password = $('#Password').val();
+                var $form = $(this).parents('form:first');
+                var reqJson = $form.serializeObject();
 
-                $request.html(syntaxHighlight(JSON.stringify(reqDummy, null, 4)));
+                $request.html(syntaxHighlight(JSON.stringify(reqJson, null, 4)));
                 $ul.text('processing request...');
 
+                // uncoment url to change api implementation
                 var request = $.ajax({
-                    url: "/api/v5/user/signup",
+                    //url: "/api/v5/user/" + $form.attr('data-action'),
+                    url: "/api1/v5/user1/" + $form.attr('data-action'),
                     type: "POST",
-                    data: $('#simpleform').serialize(),
+                    data: $form.serialize(),
                     dataType: "json"
                 });
 
@@ -64,6 +102,23 @@
             });
         });
 
+
+        // just some formating helpers
+        $.fn.serializeObject = function () {
+            var o = {};
+            var a = this.serializeArray();
+            $.each(a, function () {
+                if (o[this.name] !== undefined) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = this.value || '';
+                }
+            });
+            return o;
+        };
         function syntaxHighlight(json) {
             if (typeof json != 'string') {
                 json = JSON.stringify(json, undefined, 2);
@@ -85,5 +140,7 @@
                 return '<span class="' + cls + '">' + match + '</span>';
             });
         }
+
+
     </script>
 }
